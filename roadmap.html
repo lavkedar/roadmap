@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SVG.js Red Circle Example</title>
+    <script src="node_modules/@svgdotjs/svg.js/dist/svg.js"></script>
+    <script src="node_modules/@svgdotjs/svg.panzoom.js/dist/svg.panzoom.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script>
+
+    <style>
+      svg {
+        background-color: steelblue;
+        background-image: url(https://oobrien.com/wordpress/wp-content/uploads/2016/07/googlemaps_july2016.jpg);
+        background-repeat: no-repeat;
+        background-size: cover;
+        max-width: 100%;
+      }
+
+      #svg-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="svg-container"></div>
+    <!-- <svg height="500" width="500" id="side">
+      <circle r="20" cx="80" cy="80" fill="red"></circle>
+    </svg>
+    <script>
+      const side = document.getElementById("side");
+      const panZoom = svgPanZoom(side, {
+        zoomEnabled: true,
+      });
+    </script> -->
+
+    <script>
+      // Wait for the document to be ready before creating the SVG
+
+      const svgContainer = document.getElementById("svg-container");
+
+      // Get the dimensions of the viewport
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+
+      // Create an SVG.js drawing with viewport dimensions
+      const draw = SVG()
+        .addTo(svgContainer)
+        .size(viewportWidth, viewportHeight)
+        .viewbox(`0 0 ${viewportWidth} ${viewportHeight}`)
+        .panZoom()
+        .attr({ id: "main" });
+
+      // Define the coordinates of the starting and ending diagonals
+      const startX = 0;
+      const startY = 0;
+      const endX = viewportWidth;
+      const endY = viewportHeight;
+
+      // Create an array to store the positions of the circles
+      const circlePositions = [];
+
+      // Create 8 mini circles with randomized positions and store the positions
+      for (let i = 1; i <= 8; i++) {
+        // Use a custom function to determine the position
+        const { x, y } = customPosition(i / 9, startX, startY, endX, endY);
+
+        const circle1 = draw.circle(20);
+        circle1.center(x, y);
+        circle1.fill("white");
+
+        // Create a mini circle
+        const circle = draw.circle(10);
+        circle.center(x, y);
+        circle.fill("#ff0000"); // Red fill color
+
+        // Store the circle positions in the array
+        circlePositions.push({ x, y });
+      }
+
+      // Connect the circles with lines
+      for (let i = 0; i < circlePositions.length - 1; i++) {
+        const currentPos = circlePositions[i];
+        const nextPos = circlePositions[i + 1];
+
+        let l = draw
+          .line(currentPos.x, currentPos.y, currentPos.x, currentPos.y)
+          .stroke({ width: 4, color: "lightblue" })
+          .back();
+
+        console.log(l);
+
+        l.attr({ x2: currentPos.x, y2: currentPos.y })
+          .delay(i * 400)
+          .animate(400)
+          .attr({ x2: nextPos.x, y2: nextPos.y });
+      }
+
+      // Custom function to determine the position based on random factors
+      function customPosition(t, startX, startY, endX, endY) {
+        // Use a custom factor to control the distribution of points
+        const randomX = Math.random() * 100 - 50;
+        const randomY = Math.random() * 100 - 50;
+        const x = startX + t * (endX - startX) + randomX;
+        const y = startY + t * (endY - startY) + randomY;
+        return { x, y };
+      }
+    </script>
+    <!-- <script>
+      const main = document.getElementById("main");
+
+      const panZ = svgPanZoom(main, {
+        zoomEnabled: true,
+        controlIconsEnabled: true,
+      });
+    </script> -->
+  </body>
+</html>
